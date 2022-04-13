@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -30,9 +31,6 @@ func AWS(cmd *cobra.Command, args []string) {
 	req, err := http.NewRequest("GET", "", nil)
 	signer := v4.NewSigner()
 	signer.SignHTTP(context.TODO(), credentials, req, "hash", "lambda", cfg.Region, time.Now())
-	fmt.Println(req.Header)
-}
-
-func Init() {
-
+	headerBytes, err := json.Marshal(req.Header)
+	fmt.Println(string(headerBytes))
 }
