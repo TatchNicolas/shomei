@@ -7,10 +7,9 @@ package cmd
 import (
 	"os"
 
+	"github.com/TatchNicolas/shomei/cmd/aws"
 	"github.com/spf13/cobra"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -46,6 +45,5 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.AddCommand(aws.Cmd)
 }
-
-
