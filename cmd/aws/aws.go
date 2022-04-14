@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,8 +15,6 @@ import (
 )
 
 var (
-	url     string
-	method  string
 	payload string
 	service string
 
@@ -30,6 +27,9 @@ var (
 )
 
 func AWS(cmd *cobra.Command, args []string) {
+	method := args[0]
+	url := args[1]
+
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		fmt.Printf("ERROR in LoadDefaultConfig: %s", err)
@@ -41,8 +41,14 @@ func AWS(cmd *cobra.Command, args []string) {
 	req, err := http.NewRequest(method, url, nil)
 	signer := v4.NewSigner()
 	signer.SignHTTP(context.TODO(), credentials, req, getPayloadHash(payload), service, cfg.Region, time.Now())
-	headerBytes, err := json.Marshal(req.Header)
-	fmt.Println(string(headerBytes))
+
+	// TODO compose string with different format for curl and httpie
+	// for k, v := range req.Header {
+	// }
+
+	// as JSON
+	// headerBytes, err := json.Marshal(req.Header)
+	// fmt.Println(string(headerBytes))
 
 	// DEBUG
 	client := new(http.Client)
@@ -64,8 +70,6 @@ func getPayloadHash(payload string) string {
 }
 
 func init() {
-	Cmd.Flags().StringVarP(&url, "url", "u", "", "URL to send request")
-	Cmd.Flags().StringVarP(&method, "method", "m", "", "Request method")
 	Cmd.Flags().StringVarP(&payload, "payload", "p", "", "Request payload")
 	Cmd.Flags().StringVarP(&service, "service", "s", "", "Request payload")
 }
