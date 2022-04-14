@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 TatchNicolas
 
 */
 package cmd
@@ -14,16 +14,12 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "shomei",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Prints HTTP request header for public cloud API",
+	Long: `shomei is a CLI to print HTTP request header for public cloud API to be used with curl or httpie.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+This tool assumes credentials for the official CLI is already available in the terminal session.
+For example, AWS_XXX environment variables for AWS CLI or ADC for gcloud command.
+`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
