@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
@@ -15,10 +16,9 @@ import (
 )
 
 var (
-	payload string
 	service string
-
-	Cmd = &cobra.Command{
+	methods = [...]string{"GET", "POST", "PUT", "DELETE", "HEAD", "CONNECT", "OPTIONS", "PATCH", "TRACE"}
+	Cmd     = &cobra.Command{
 		Use:   "aws",
 		Short: "Print HTTP request header for AWS",
 		Long:  "Print Authorization header for AWS using default credentials",
@@ -27,8 +27,7 @@ var (
 )
 
 func AWS(cmd *cobra.Command, args []string) {
-	method := args[0]
-	url := args[1]
+	method, url, _, _, payload := parseArgs(args)
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
@@ -64,12 +63,64 @@ func AWS(cmd *cobra.Command, args []string) {
 	fmt.Println(string(bodyBytes))
 }
 
+func parseArgs(args []string) (string, string, map[string][]string, map[string][]string, string) {
+	// TODO define struct for return value
+	var (
+		method  string
+		url     string
+		headers map[string][]string
+		queries map[string][]string
+		payload string
+	)
+
+	var kvList []string
+
+	// check if the first arg is a method
+	for _, m := range methods {
+		if args[0] == m {
+			method = m
+			url = args[1]
+			kvList = args[2:]
+			break
+		}
+	}
+
+	for _, kv := range kvList {
+		byColon := strings.Split(kv, ":")
+		if len(byColon) == 2 {
+			headers[byColon[0]] = append(headers[byColon[0]], byColon[1])
+		}
+
+		// bySingleEqual := strings.Split(kv, "=")
+		// if len(byColon) == 2 {
+		// 	headers[bySingleEqual[0]] = append(payload[bySingleEqual[0]], bySingleEqual[1])
+		// }
+
+		byDoubleEqual := strings.Split(kv, "==")
+		if len(byDoubleEqual) == 2 {
+			queries[byDoubleEqual[0]] = append(queries[byDoubleEqual[0]], byDoubleEqual[1])
+		}
+	}
+
+	// set default method if not specified
+	if method == "" {
+		url = args[0]
+		if payload == "" {
+			method = "GET"
+		} else {
+			method = "POST"
+		}
+	}
+
+	return method, url, headers, queries, payload
+}
+
 func getPayloadHash(payload string) string {
 	hashed := sha256.Sum256([]byte(payload))
 	return hex.EncodeToString(hashed[:])
 }
 
 func init() {
-	Cmd.Flags().StringVarP(&payload, "payload", "p", "", "Request payload")
-	Cmd.Flags().StringVarP(&service, "service", "s", "", "Request payload")
+	Cmd.Flags().StringVarP(&service, "service", "s", "", "")
+	Cmd.MarkFlagRequired("service")
 }
