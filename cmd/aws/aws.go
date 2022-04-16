@@ -41,14 +41,6 @@ func AWS(cmd *cobra.Command, args []string) {
 	signer := v4.NewSigner()
 	signer.SignHTTP(context.TODO(), credentials, req, getPayloadHash(payload), service, cfg.Region, time.Now())
 
-	// TODO compose string with different format for curl and httpie
-	// for k, v := range req.Header {
-	// }
-
-	// as JSON
-	// headerBytes, err := json.Marshal(req.Header)
-	// fmt.Println(string(headerBytes))
-
 	// DEBUG
 	client := new(http.Client)
 	resp, err := client.Do(req)

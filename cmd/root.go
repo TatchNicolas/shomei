@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/TatchNicolas/shomei/cmd/aws"
+	"github.com/TatchNicolas/shomei/cmd/playground"
 	"github.com/spf13/cobra"
 )
 
@@ -30,4 +31,5 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(aws.Cmd)
+	rootCmd.AddCommand(playground.Cmd)
 }
